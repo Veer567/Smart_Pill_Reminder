@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:medicine/screens/signup_screen.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+// Screen for user sign-in
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -11,33 +13,45 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  // Form key for validation
   final _formKey = GlobalKey<FormState>();
+
+  // Controllers for email and password input fields
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  // Error messages for validation
   String? _emailError;
   String? _passwordError;
 
-  void _validateAndSubmit() {
+  // Validates form and navigates to home if credentials are valid
+  void _validateAndSubmit() async {
     setState(() {
       _emailError = _validateEmail(_emailController.text);
       _passwordError = _validatePassword(_passwordController.text);
-      if (_emailError == null && _passwordError == null) {
-        // Hardcoded credentials for testing
-        const testEmail = 'testing145@gmail.com';
-        const testPassword = 'testing753';
-        if (_emailController.text == testEmail &&
-            _passwordController.text == testPassword) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomeScreen()),
-          );
-        } else {
-          _passwordError = 'Invalid email or password';
-        }
-      }
     });
+
+    if (_emailError == null && _passwordError == null) {
+      try {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Navigate to home if login is successful
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _passwordError = e.message; // Show Firebase error
+        });
+      }
+    }
   }
 
+  // Validates email format
   String? _validateEmail(String value) {
     if (value.isEmpty) return 'Email is required';
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(value)) {
@@ -46,6 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return null;
   }
 
+  // Validates password format
   String? _validatePassword(String value) {
     if (value.isEmpty) return 'Password is required';
     if (value.length < 8) return 'Password must be at least 8 characters';
@@ -56,6 +71,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive sizing
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -73,6 +89,7 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Title
                   Text(
                     'Log In',
                     style: TextStyle(
@@ -82,7 +99,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
+
                   SizedBox(height: screenHeight * 0.06),
+
+                  // Email input field
                   TextFormField(
                     controller: _emailController,
                     style: const TextStyle(color: Colors.black87),
@@ -99,7 +119,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.03),
+
+                  // Password input field
                   TextFormField(
                     controller: _passwordController,
                     style: const TextStyle(color: Colors.black87),
@@ -117,7 +140,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.02),
+
+                  // Forgot password link
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -138,7 +164,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.04),
+
+                  // Log In button
                   ElevatedButton(
                     onPressed: _validateAndSubmit,
                     style: ElevatedButton.styleFrom(
@@ -157,7 +186,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       style: TextStyle(fontSize: screenWidth * 0.045),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.04),
+
+                  // Social login icons (placeholders)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -178,7 +210,10 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ],
                   ),
+
                   SizedBox(height: screenHeight * 0.03),
+
+                  // Sign up navigation link
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(

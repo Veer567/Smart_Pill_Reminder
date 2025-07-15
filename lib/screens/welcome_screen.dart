@@ -2,33 +2,40 @@ import 'package:flutter/material.dart';
 import 'signin_screen.dart';
 import 'signup_screen.dart';
 
+// Stateless widget for the Welcome Screen
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Get screen height and width for responsive sizing
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Set background color
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.05,
-              vertical: screenHeight * 0.03,
+        child: Center(
+          // Center widget to vertically and horizontally center the content
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: screenHeight, // Ensure it takes full height
             ),
-            child: Center(
+            child: IntrinsicHeight(
+              // Makes the Column take the height of its children
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Center vertically
                 children: [
+                  // Logo/Image at the top
                   Image.asset(
-                    'assets/images/medicine.png',
+                    'assets/images/Group.png',
                     height: screenHeight * 0.18,
                     width: screenWidth * 0.4,
                   ),
                   SizedBox(height: screenHeight * 0.03),
+
+                  // Welcome message
                   Text(
                     'Welcome to Smart Medicine',
                     style: TextStyle(
@@ -39,6 +46,8 @@ class WelcomeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: screenHeight * 0.01),
+
+                  // Subtext message
                   Text(
                     'Manage your health with ease',
                     style: TextStyle(
@@ -48,6 +57,8 @@ class WelcomeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: screenHeight * 0.05),
+
+                  // Sign In button
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -56,8 +67,8 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.black87, // Button color
+                      foregroundColor: Colors.white, // Text color
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.1,
                         vertical: screenHeight * 0.02,
@@ -72,6 +83,8 @@ class WelcomeScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.02),
+
+                  // Create Account button
                   OutlinedButton(
                     onPressed: () {
                       Navigator.push(
@@ -80,7 +93,7 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black87),
+                      side: BorderSide(color: Colors.black87), // Border color
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.1,
                         vertical: screenHeight * 0.02,

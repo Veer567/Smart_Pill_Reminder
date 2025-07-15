@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/screens/signin_screen.dart';
 
-
+// Screen to handle forgotten password
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -10,17 +10,25 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  // Form key for validation
   final _formKey = GlobalKey<FormState>();
+
+  // Controller for the email input
   final _emailController = TextEditingController();
+
+  // Stores email validation error message
   String? _emailError;
 
+  // Validates email and navigates to SignInScreen if valid
   void _validateAndSubmit() {
     setState(() {
       _emailError = _validateEmail(_emailController.text);
       if (_emailError == null) {
+        // Show confirmation snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Password reset link sent!')),
         );
+        // Navigate to sign-in screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const SignInScreen()),
@@ -29,6 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     });
   }
 
+  // Email validation logic using regex
   String? _validateEmail(String value) {
     if (value.isEmpty) return 'Email is required';
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(value)) {
@@ -39,6 +48,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive UI
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -56,6 +66,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Title
                   Text(
                     'Forgot Password',
                     style: TextStyle(
@@ -66,6 +77,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: screenHeight * 0.06),
+
+                  // Subtitle
                   Text(
                     'Enter your email to reset your password',
                     style: TextStyle(
@@ -75,6 +88,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     textAlign: TextAlign.center,
                   ),
                   SizedBox(height: screenHeight * 0.05),
+
+                  // Email input field
                   TextFormField(
                     controller: _emailController,
                     style: const TextStyle(color: Colors.black87),
@@ -92,6 +107,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.04),
+
+                  // Reset Password Button
                   ElevatedButton(
                     onPressed: _validateAndSubmit,
                     style: ElevatedButton.styleFrom(
@@ -111,6 +128,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.04),
+
+                  // Back to login button
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(
@@ -120,7 +139,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                     child: Text(
                       'Back to Log In',
-                      style: TextStyle(color: Colors.grey[600], fontSize: screenWidth * 0.035),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: screenWidth * 0.035,
+                      ),
                     ),
                   ),
                 ],

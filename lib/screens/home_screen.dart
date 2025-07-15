@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicine/screens/add_medicine_screen.dart';
 import 'profile_screen.dart';
 
+// Home screen with bottom navigation and medicine management UI
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -10,14 +11,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Index for tracking bottom navigation bar selection
   int _selectedIndex = 0;
 
+  // Handles navigation when a bottom nav item is tapped
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Add navigation logic if needed
+    // Navigate to ProfileScreen when profile icon is tapped
     if (index == 3) {
       Navigator.push(
         context,
@@ -28,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive UI
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -43,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top row: Home + Logout
+                // Top header: "Home" title
                 Text(
                   'Home',
                   style: TextStyle(
@@ -55,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 20),
 
-                // 🔍 Search bar
+                // 🔍 Search bar to find medicines
                 TextField(
                   decoration: InputDecoration(
                     hintText: 'Search medicines...',
@@ -68,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 40),
 
-                // Center image & texts
+                // 🖼️ Center image with title and description
                 Center(
                   child: Column(
                     children: [
@@ -100,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // ➕ FAB for adding medicine
+      // ➕ Floating action button to add a new medicine
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -114,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
-      // Bottom navigation bar
+      // 🔽 Bottom navigation bar with 4 items
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

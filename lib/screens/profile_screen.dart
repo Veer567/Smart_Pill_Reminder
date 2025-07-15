@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/screens/welcome_screen.dart';
+import 'package:medicine/screens/home_screen.dart';
 
+// Profile screen where users can view and edit personal information
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -9,13 +11,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  // Controllers for form fields
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  // Toggle for showing/hiding password
   bool _isPasswordVisible = false;
 
+  // Dispose controllers when the screen is destroyed
   @override
   void dispose() {
     emailController.dispose();
@@ -33,38 +38,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           children: [
-            // Top Bar
+            // Top Bar with back button and settings icon
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Icon(Icons.arrow_back_ios),
-                Icon(Icons.settings),
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios),
+                  onPressed: () {
+                    // Navigate back to HomeScreen
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    );
+                  },
+                ),
+                const Icon(Icons.settings),
               ],
             ),
 
             const SizedBox(height: 20),
 
-            // Fixed Profile Image
-            const Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/images/person.png'),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Role title
-            const Center(
-              child: Text(
-                'Medicine Reminder User',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-            ),
-
             const SizedBox(height: 30),
 
-            // Name
+            // Name input field
             const Text("Your Name"),
             const SizedBox(height: 8),
             TextField(
@@ -80,7 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-            // Email
+            // Email input field
             const Text("Your Email"),
             const SizedBox(height: 8),
             TextField(
@@ -97,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-            // Phone
+            // Phone number input field
             const Text("Phone Number"),
             const SizedBox(height: 8),
             TextField(
@@ -114,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-            // Password
+            // Password input field with visibility toggle
             const Text("Password"),
             const SizedBox(height: 8),
             TextField(
@@ -130,6 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : Icons.visibility_off,
                   ),
                   onPressed: () {
+                    // Toggle password visibility
                     setState(() {
                       _isPasswordVisible = !_isPasswordVisible;
                     });
@@ -143,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 30),
 
-            // Logout Button
+            // Logout button that navigates to WelcomeScreen
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
@@ -155,6 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () {
+                  // Navigate to WelcomeScreen on logout
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const WelcomeScreen()),

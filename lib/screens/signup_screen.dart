@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/screens/signin_screen.dart';
 import 'welcome_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+// Sign-up screen widget
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -10,29 +12,52 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  // Form key for validation
   final _formKey = GlobalKey<FormState>();
+
+  // Controllers for input fields
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  // Variables to hold validation error messages
   String? _emailError;
   String? _passwordError;
   String? _confirmPasswordError;
 
-  void _validateAndSubmit() {
+  // Function to validate and navigate to Welcome screen if successful
+  void _validateAndSubmit() async {
     setState(() {
       _emailError = _validateEmail(_emailController.text);
       _passwordError = _validatePassword(_passwordController.text);
       _confirmPasswordError = _validateConfirmPassword(
-          _passwordController.text, _confirmPasswordController.text);
-      if (_emailError == null && _passwordError == null && _confirmPasswordError == null) {
+        _passwordController.text,
+        _confirmPasswordController.text,
+      );
+    });
+
+    if (_emailError == null &&
+        _passwordError == null &&
+        _confirmPasswordError == null) {
+      try {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const WelcomeScreen()),
         );
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _emailError = e.message;
+        });
       }
-    });
+    }
   }
 
+  // Email validation logic
   String? _validateEmail(String value) {
     if (value.isEmpty) return 'Email is required';
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(value)) {
@@ -41,13 +66,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return null;
   }
 
+  // Password validation logic
   String? _validatePassword(String value) {
     if (value.isEmpty) return 'Password is required';
     if (value.length < 8) return 'Password must be at least 8 characters';
-    if (!value.contains(RegExp(r'[0-9]'))) return 'Password must contain a digit';
+    if (!value.contains(RegExp(r'[0-9]')))
+      return 'Password must contain a digit';
     return null;
   }
 
+  // Confirm password validation logic
   String? _validateConfirmPassword(String password, String confirmPassword) {
     if (confirmPassword.isEmpty) return 'Confirm password is required';
     if (password != confirmPassword) return 'Passwords do not match';
@@ -56,6 +84,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions for responsive layout
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -73,6 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Title
                   Text(
                     'Sign Up',
                     style: TextStyle(
@@ -82,7 +112,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
+
                   SizedBox(height: screenHeight * 0.06),
+
+                  // Email input field
                   TextFormField(
                     controller: _emailController,
                     style: const TextStyle(color: Colors.black87),
@@ -99,7 +132,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.03),
+
+                  // Password input field
                   TextFormField(
                     controller: _passwordController,
                     style: const TextStyle(color: Colors.black87),
@@ -119,7 +155,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.03),
+
+                  // Confirm password input field
                   TextFormField(
                     controller: _confirmPasswordController,
                     style: const TextStyle(color: Colors.black87),
@@ -137,7 +176,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.04),
+
+                  // Sign Up button
                   ElevatedButton(
                     onPressed: _validateAndSubmit,
                     style: ElevatedButton.styleFrom(
@@ -156,7 +198,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(fontSize: screenWidth * 0.045),
                     ),
                   ),
+
                   SizedBox(height: screenHeight * 0.03),
+
+                  // Link to Sign In screen
                   TextButton(
                     onPressed: () {
                       Navigator.pushReplacement(
@@ -166,7 +211,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                     child: Text(
                       'Already have an account? Log In',
-                      style: TextStyle(color: Colors.grey[600], fontSize: screenWidth * 0.035),
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: screenWidth * 0.035,
+                      ),
                     ),
                   ),
                 ],
