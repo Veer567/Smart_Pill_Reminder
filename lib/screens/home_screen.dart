@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:medicine/screens/NearbyPharmacyScreen.dart';
 import 'package:medicine/screens/add_medicine_screen.dart';
-import 'profile_screen.dart';
+import 'package:medicine/screens/medicine_info_screen.dart.dart';
+import 'package:medicine/screens/profile_screen.dart';
+import 'package:medicine/services/firestore_service.dart';
 
-// Home screen with bottom navigation and medicine management UI
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -11,114 +14,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Index for tracking bottom navigation bar selection
   int _selectedIndex = 0;
 
-  // Handles navigation when a bottom nav item is tapped
+  // List of screens to display based on BottomNavigationBar index
+  final List<Widget> _screens = [
+    const HomeContent(), // Home screen content
+    const MedicineInfoScreen(), // Medications screen
+    const NearbyPharmacyScreen(), // Placeholder for Nearby screen
+    const ProfileScreen(), // Profile screen
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-
-    // Navigate to ProfileScreen when profile icon is tapped
-    if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const ProfileScreen()),
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions for responsive UI
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: screenWidth * 0.05,
-              vertical: screenHeight * 0.03,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top header: "Home" title
-                Text(
-                  'Home',
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.08,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // 🔍 Search bar to find medicines
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search medicines...',
-                    prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-
-                // 🖼️ Center image with title and description
-                Center(
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'assets/images/reminder_12570772.png',
-                        height: screenHeight * 0.25,
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Manage your meds',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Add your meds to be reminded on time\nand track your health',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-
-      // ➕ Floating action button to add a new medicine
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddMedicineScreen()),
-          );
-        },
-        backgroundColor: Colors.black87,
-        child: const Icon(Icons.add, color: Colors.white),
-        mini: true,
-      ),
+      body: _screens[_selectedIndex], // Display the selected screen
+      floatingActionButton: _selectedIndex == 0
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AddMedicineScreen()),
+                );
+              },
+              backgroundColor: Colors.black87,
+              child: const Icon(Icons.add, color: Colors.white),
+              mini: true,
+            )
+          : null, // Show FAB only on Home screen
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
-      // 🔽 Bottom navigation bar with 4 items
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -134,6 +64,154 @@ class _HomeScreenState extends State<HomeScreen> {
         unselectedItemColor: Colors.grey[600],
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
+      ),
+    );
+  }
+}
+
+// Home screen content extracted as a separate widget
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.05,
+            vertical: screenHeight * 0.03,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Home',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.08,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search medicines...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Your Medicines",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo[800],
+                ),
+              ),
+              const SizedBox(height: 10),
+              StreamBuilder<QuerySnapshot>(
+                stream: FirestoreService().getMedicineStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: Text("No medicines added yet."),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final doc = snapshot.data!.docs[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        elevation: 2,
+                        child: ListTile(
+                          title: Text(data['name'] ?? ''),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Dose: ${data['dose']}'),
+                              Text('Time: ${data['time']}'),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => AddMedicineScreen(
+                                        docId: doc.id,
+                                        existingData: data,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text('Confirm Delete'),
+                                      content: const Text(
+                                        'Are you sure you want to delete this?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: const Text('Cancel'),
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                        ),
+                                        ElevatedButton(
+                                          child: const Text('Delete'),
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirm == true) {
+                                    await FirestoreService().deleteMedicine(
+                                      doc.id,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

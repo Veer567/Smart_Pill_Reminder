@@ -1,21 +1,19 @@
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.medicine"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973" // Override to match firebase_auth and firebase_core requirements
+    compileSdk = 35 // Matches flutter_local_notifications requirement
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true // Enable core library desugaring
     }
 
     kotlinOptions {
@@ -23,22 +21,23 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID[](https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.medicine"
-        // Override minSdk to match firebase-auth:23.2.1 requirement
-        minSdk = 23 // Updated from flutter.minSdkVersion (21) to 23
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21 // Matches Flutter and firebase-auth requirements
+        targetSdk = 35 // Matches compileSdk for Android 13+
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4") // Add for desugaring
+    // implementation("com.android.tools:desugar_jdk_libs:2.1.4") // Remove or comment out
 }
 
 flutter {

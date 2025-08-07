@@ -97,6 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               horizontal: screenWidth * 0.05,
               vertical: screenHeight * 0.03,
             ),
+            
             child: Form(
               key: _formKey,
               child: Column(

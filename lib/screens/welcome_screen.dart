@@ -12,8 +12,12 @@ class WelcomeScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    // Define common button size
+    final buttonWidth = screenWidth * 0.6; // Wider buttons as per design
+    final buttonHeight = screenHeight * 0.07; // Taller buttons
+
     return Scaffold(
-      backgroundColor: Colors.white, // Set background color
+      backgroundColor: Colors.white, // White background
       body: SafeArea(
         child: Center(
           // Center widget to vertically and horizontally center the content
@@ -22,39 +26,56 @@ class WelcomeScreen extends StatelessWidget {
               minHeight: screenHeight, // Ensure it takes full height
             ),
             child: IntrinsicHeight(
-              // Makes the Column take the height of its children
               child: Column(
                 mainAxisAlignment:
                     MainAxisAlignment.center, // Center vertically
                 children: [
                   // Logo/Image at the top
                   Image.asset(
-                    'assets/images/Group.png',
-                    height: screenHeight * 0.18,
+                    'assets/images/group.png', // Replace with your logo asset
+                    height: screenHeight * 0.2,
                     width: screenWidth * 0.4,
                   ),
                   SizedBox(height: screenHeight * 0.03),
 
-                  // Welcome message
+                  // Dashed line separator
+                  Container(
+                    height: 1,
+                    width: screenWidth * 0.8,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.blue[200]!,
+                          style: BorderStyle.none,
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // App name
                   Text(
-                    'Welcome to Smart Medicine',
+                    'MediRem',
                     style: TextStyle(
-                      fontSize: screenWidth * 0.06,
+                      fontSize: screenWidth * 0.08,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: Color(0xFFF28C38), // Orange color from the image
                     ),
                     textAlign: TextAlign.center,
+                    maxLines: 1,
                   ),
-                  SizedBox(height: screenHeight * 0.01),
+                  SizedBox(height: screenHeight * 0.02),
 
-                  // Subtext message
+                  // Subtext
                   Text(
-                    'Manage your health with ease',
+                    'Your smart companion for daily \nmedicine reminders.',
                     style: TextStyle(
                       fontSize: screenWidth * 0.04,
-                      color: Colors.grey[600],
+                      color: Colors.black,
                     ),
                     textAlign: TextAlign.center,
+                    maxLines: 2,
                   ),
                   SizedBox(height: screenHeight * 0.05),
 
@@ -67,14 +88,11 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87, // Button color
-                      foregroundColor: Colors.white, // Text color
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.1,
-                        vertical: screenHeight * 0.02,
-                      ),
+                      backgroundColor: Color(0xFF2E7D7D), // Teal color
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(buttonWidth, buttonHeight),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.05),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
@@ -93,20 +111,18 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.black87), // Border color
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.1,
-                        vertical: screenHeight * 0.02,
-                      ),
+                      backgroundColor: Colors.black,
+                      side: BorderSide(color: Colors.black), // Teal outline
+                      minimumSize: Size(buttonWidth, buttonHeight),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.05),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     child: Text(
-                      'Create Account',
+                      'Create account',
                       style: TextStyle(
                         fontSize: screenWidth * 0.045,
-                        color: Colors.black87,
+                        color: Colors.white,
                       ),
                     ),
                   ),
