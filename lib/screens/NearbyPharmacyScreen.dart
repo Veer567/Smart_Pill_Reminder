@@ -19,7 +19,7 @@ class _NearbyPharmacyScreenState extends State<NearbyPharmacyScreen> {
   LatLng? _currentLocation;
 
   final String apiKey =
-      'AIzaSyC_mpZx8QB5yruGS8qnF2hl8Ohh3dr3wc0'; // Replace with your real key
+      'your_api_key'; // Replace with your real key
 
   @override
   void initState() {
