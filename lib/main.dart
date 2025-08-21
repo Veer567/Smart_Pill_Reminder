@@ -1,10 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'screens/splash_screen.dart';
-import 'services/notification_service.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'firebase_options.dart';
+import 'services/notification_service.dart';
+import 'screens/auth_wrapper.dart';
+
+// A top-level function to handle foreground notification actions
+@pragma('vm:entry-point')
+void notificationTapForegroundHandler(
+  NotificationResponse notificationResponse,
+) async {
+  print('notificationTapForegroundHandler: ${notificationResponse.payload}');
+  if (notificationResponse.payload != null) {
+    final parts = notificationResponse.payload!.split('_');
+    final docId = parts.last;
+    if (notificationResponse.payload!.contains('snooze_10')) {
+      await NotificationService.snoozeNotification(docId: docId, minutes: 10);
+    } else if (notificationResponse.payload!.contains('snooze_15')) {
+      await NotificationService.snoozeNotification(docId: docId, minutes: 15);
+    } else if (notificationResponse.payload!.contains('mark_as_taken')) {
+      await NotificationService.markAsTaken(docId);
+    }
+  }
+}
+
+// A top-level function to handle background notification actions
+@pragma('vm:entry-point')
+Future<void> notificationTapBackgroundHandler(
+  NotificationResponse notificationResponse,
+) async {
+  print('notificationTapBackgroundHandler: ${notificationResponse.payload}');
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService.initialize();
+  if (notificationResponse.payload != null) {
+    final parts = notificationResponse.payload!.split('_');
+    final docId = parts.last;
+    if (notificationResponse.payload!.contains('snooze_10')) {
+      await NotificationService.snoozeNotification(docId: docId, minutes: 10);
+    } else if (notificationResponse.payload!.contains('snooze_15')) {
+      await NotificationService.snoozeNotification(docId: docId, minutes: 15);
+    } else if (notificationResponse.payload!.contains('mark_as_taken')) {
+      await NotificationService.markAsTaken(docId);
+    }
+  }
+}
 
 Future<void> requestNotificationPermission(BuildContext context) async {
   print("Requesting notification permission...");
@@ -61,8 +102,23 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   print("Initializing Firebase...");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: notificationTapForegroundHandler,
+    onDidReceiveBackgroundNotificationResponse:
+        notificationTapBackgroundHandler,
+  );
+
   print("Initializing NotificationService...");
   await NotificationService.initialize();
+
   try {
     print("Rescheduling notifications...");
     await NotificationService.rescheduleAllNotifications();
@@ -72,8 +128,10 @@ void main() async {
   } catch (e) {
     print("Error during notification setup: $e");
   }
+
   print("Requesting battery optimization...");
   await requestIgnoreBatteryOptimizations();
+
   runApp(const SmartMedicineApp());
 }
 
@@ -91,7 +149,7 @@ class SmartMedicineApp extends StatelessWidget {
       title: 'Smart Medicine',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.indigo),
-      home: const SplashScreen(),
+      home: const AuthWrapper(), // 👈 directly goes to AuthWrapper
     );
   }
 }

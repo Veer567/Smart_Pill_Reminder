@@ -64,8 +64,9 @@ class _SignInScreenState extends State<SignInScreen> {
   String? _validatePassword(String value) {
     if (value.isEmpty) return 'Password is required';
     if (value.length < 8) return 'Password must be at least 8 characters';
-    if (!value.contains(RegExp(r'[0-9]')))
+    if (!value.contains(RegExp(r'[0-9]'))) {
       return 'Password must contain a digit';
+    }
     return null;
   }
 
@@ -74,6 +75,10 @@ class _SignInScreenState extends State<SignInScreen> {
     // Get screen dimensions for responsive sizing
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
+    // Define colors from the logo for consistency
+    const Color brandOrange = Color(0xFFF28C38);
+    const Color brandTeal = Color(0xFF2E7D7D);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -95,7 +100,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     style: TextStyle(
                       fontSize: screenWidth * 0.08,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: brandOrange, // Updated to brand orange
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -108,13 +113,13 @@ class _SignInScreenState extends State<SignInScreen> {
                     style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       labelText: 'Email address',
-                      labelStyle: TextStyle(color: Colors.grey[600]),
+                      labelStyle: TextStyle(color: brandTeal),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                       errorText: _emailError,
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
+                        borderSide: const BorderSide(color: brandTeal),
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
@@ -129,13 +134,13 @@ class _SignInScreenState extends State<SignInScreen> {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Password',
-                      labelStyle: TextStyle(color: Colors.grey[600]),
+                      labelStyle: TextStyle(color: brandTeal),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                       errorText: _passwordError,
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
+                        borderSide: const BorderSide(color: brandTeal),
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
@@ -144,34 +149,13 @@ class _SignInScreenState extends State<SignInScreen> {
                   SizedBox(height: screenHeight * 0.02),
 
                   // Forgot password link
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ForgotPasswordScreen(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'Forgot password?',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: screenWidth * 0.035,
-                        ),
-                      ),
-                    ),
-                  ),
-
                   SizedBox(height: screenHeight * 0.04),
 
                   // Log In button
                   ElevatedButton(
                     onPressed: _validateAndSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
+                      backgroundColor: brandOrange, // Updated to brand orange
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.2,
@@ -189,28 +173,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
                   SizedBox(height: screenHeight * 0.04),
 
-                  // Social login icons (placeholders)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.facebook, color: Colors.black87),
-                        onPressed: () {},
-                        iconSize: screenWidth * 0.08,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.mail, color: Colors.black87),
-                        onPressed: () {},
-                        iconSize: screenWidth * 0.08,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.apple, color: Colors.black87),
-                        onPressed: () {},
-                        iconSize: screenWidth * 0.08,
-                      ),
-                    ],
-                  ),
-
                   SizedBox(height: screenHeight * 0.03),
 
                   // Sign up navigation link
@@ -224,7 +186,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Text(
                       "Don't have an account? Sign Up",
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: brandTeal, // Updated to brand teal
                         fontSize: screenWidth * 0.035,
                       ),
                     ),

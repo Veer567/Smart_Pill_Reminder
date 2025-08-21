@@ -70,8 +70,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? _validatePassword(String value) {
     if (value.isEmpty) return 'Password is required';
     if (value.length < 8) return 'Password must be at least 8 characters';
-    if (!value.contains(RegExp(r'[0-9]')))
+    if (!value.contains(RegExp(r'[0-9]'))) {
       return 'Password must contain a digit';
+    }
     return null;
   }
 
@@ -88,6 +89,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    // Define brand colors for consistency
+    const Color brandOrange = Color(0xFFF28C38);
+    const Color brandTeal = Color(0xFF2E7D7D);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -97,7 +102,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               horizontal: screenWidth * 0.05,
               vertical: screenHeight * 0.03,
             ),
-            
+
             child: Form(
               key: _formKey,
               child: Column(
@@ -109,7 +114,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: TextStyle(
                       fontSize: screenWidth * 0.08,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: brandOrange, // Updated to brand orange
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -122,13 +127,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      labelStyle: TextStyle(color: Colors.grey[600]),
+                      labelStyle: const TextStyle(
+                        color: brandTeal,
+                      ), // Updated to brand teal
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                       errorText: _emailError,
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
+                        borderSide: const BorderSide(
+                          color: brandTeal,
+                        ), // Updated to brand teal
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
@@ -143,15 +152,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Create a password',
-                      labelStyle: TextStyle(color: Colors.grey[600]),
+                      labelStyle: const TextStyle(
+                        color: brandTeal,
+                      ), // Updated to brand teal
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                       errorText: _passwordError,
                       helperText: 'Must be 8 characters',
-                      helperStyle: TextStyle(color: Colors.grey[600]),
+                      helperStyle: const TextStyle(
+                        color: brandTeal,
+                      ), // Updated to brand teal
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
+                        borderSide: const BorderSide(
+                          color: brandTeal,
+                        ), // Updated to brand teal
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
@@ -166,13 +181,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: 'Confirm password',
-                      labelStyle: TextStyle(color: Colors.grey[600]),
+                      labelStyle: const TextStyle(
+                        color: brandTeal,
+                      ), // Updated to brand teal
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                       errorText: _confirmPasswordError,
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
+                        borderSide: const BorderSide(
+                          color: brandTeal,
+                        ), // Updated to brand teal
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
@@ -184,7 +203,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ElevatedButton(
                     onPressed: _validateAndSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
+                      backgroundColor: brandOrange, // Updated to brand orange
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.2,
@@ -213,7 +232,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Text(
                       'Already have an account? Log In',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: brandTeal, // Updated to brand teal
                         fontSize: screenWidth * 0.035,
                       ),
                     ),

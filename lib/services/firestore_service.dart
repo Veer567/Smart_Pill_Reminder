@@ -1,3 +1,4 @@
+// firestore_service.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'notification_service.dart';
@@ -11,7 +12,10 @@ class FirestoreService {
     required String type,
     required String dose,
     required String amount,
-    required String time,
+    required List<String> times,
+
+    required int stock,
+    required int dosesPerDay,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -19,7 +23,7 @@ class FirestoreService {
     }
 
     try {
-      return await _firestore
+      final docRef = await _firestore
           .collection('users')
           .doc(user.uid)
           .collection('medicines')
@@ -28,10 +32,14 @@ class FirestoreService {
             'type': type,
             'dose': dose,
             'amount': amount,
-            'time': time,
+            'times': times,
+
+            'stock': stock,
+            'dosesPerDay': dosesPerDay,
             'created_at': FieldValue.serverTimestamp(),
             'updated_at': FieldValue.serverTimestamp(),
           });
+      return docRef;
     } catch (e) {
       throw Exception('Failed to add medicine: ${e.toString()}');
     }
@@ -64,10 +72,9 @@ class FirestoreService {
           .collection('medicines')
           .get();
       return querySnapshot.docs
-          .map((doc) => {
-                'docId': doc.id,
-                ...doc.data() as Map<String, dynamic>,
-              })
+          .map(
+            (doc) => {'docId': doc.id, ...doc.data() as Map<String, dynamic>},
+          )
           .toList();
     } catch (e) {
       throw Exception('Failed to fetch medicines: ${e.toString()}');
@@ -80,7 +87,10 @@ class FirestoreService {
     required String type,
     required String dose,
     required String amount,
-    required String time,
+    required List<String> times,
+
+    required int stock,
+    required int dosesPerDay,
   }) async {
     final user = _auth.currentUser;
     if (user == null) {
@@ -98,7 +108,10 @@ class FirestoreService {
             'type': type,
             'dose': dose,
             'amount': amount,
-            'time': time,
+            'times': times,
+
+            'stock': stock,
+            'dosesPerDay': dosesPerDay,
             'updated_at': FieldValue.serverTimestamp(),
           });
     } catch (e) {
@@ -113,6 +126,7 @@ class FirestoreService {
     }
 
     try {
+      await NotificationService.cancelNotification(docId);
       await _firestore
           .collection('users')
           .doc(user.uid)
@@ -123,4 +137,39 @@ class FirestoreService {
       throw Exception('Failed to delete medicine: ${e.toString()}');
     }
   }
+
+  Future<void> decrementStock(String docId) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user found');
+    }
+
+    final medicineRef = _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('medicines')
+        .doc(docId);
+
+    try {
+      await _firestore.runTransaction((transaction) async {
+        final snapshot = await transaction.get(medicineRef);
+        final data = snapshot.data();
+        if (data != null && data.containsKey('stock')) {
+          int currentStock = data['stock'];
+          if (currentStock > 0) {
+            transaction.update(medicineRef, {
+              'stock': currentStock - 1,
+              'updated_at':
+                  FieldValue.serverTimestamp(), // 🔑 ensures StreamBuilder rebuild
+            });
+            print('Stock for $docId decremented successfully.');
+          }
+        }
+      });
+    } catch (e) {
+      print('Failed to decrement stock: $e');
+    }
+  }
 }
+// This service handles Firestore operations related to medicines, including adding, updating, deleting, and fetching medicines.
+// It also manages stock decrement operations and integrates with a notification service for reminders.

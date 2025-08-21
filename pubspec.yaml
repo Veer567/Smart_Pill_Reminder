@@ -20,21 +20,38 @@ dependencies:
   flutter_local_notifications: ^19.4.0
   timezone: ^0.10.1
   permission_handler: ^11.0.0
-  http: ^1.4.0
+  http: 1.2.2 # Pinned to avoid 1.5.0 issues
   intl: ^0.20.2
   flutter_dotenv: ^5.2.1
   shared_preferences: ^2.2.2
   animations: ^2.0.11
-  google_maps_flutter: ^2.5.0
-  geolocator: ^11.0.0
+  geolocator: ^12.0.0
   flutter_keyboard_visibility: ^6.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+
+  rename: ^3.1.0
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/images/group.png"
+  adaptive_icon_background: "assets/images/group.png"
+  adaptive_icon_foreground: "assets/images/group.png"
+  background_color: "#FFFFFF"
+
+  flutter_launcher_name:
+  name: "MediRem"
+

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/screens/signin_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 
 // Screen to handle forgotten password
 class ForgotPasswordScreen extends StatefulWidget {
@@ -19,22 +20,68 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // Stores email validation error message
   String? _emailError;
 
-  // Validates email and navigates to SignInScreen if valid
-  void _validateAndSubmit() {
+  // Define brand colors for consistency
+  static const Color brandOrange = Color(0xFFF28C38);
+  static const Color brandTeal = Color(0xFF2E7D7D);
+
+  // Validates email and sends password reset link
+  void _validateAndSubmit() async {
+    // Reset any previous errors
     setState(() {
-      _emailError = _validateEmail(_emailController.text);
-      if (_emailError == null) {
-        // Show confirmation snackbar
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset link sent!')),
-        );
-        // Navigate to sign-in screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const SignInScreen()),
-        );
-      }
+      _emailError = null;
     });
+
+    // Validate the form
+    final emailValidationMessage = _validateEmail(_emailController.text);
+    if (emailValidationMessage != null) {
+      setState(() {
+        _emailError = emailValidationMessage;
+      });
+      return;
+    }
+
+    try {
+      // Send the password reset email using Firebase Auth
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: _emailController.text.trim(),
+      );
+
+      // Show a success message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset link sent! Check your email.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navigate back to the sign-in screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SignInScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Handle Firebase-specific errors
+      setState(() {
+        _emailError = e.message;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.message}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      // Handle other potential errors
+      setState(() {
+        _emailError = 'An unexpected error occurred. Please try again.';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('An unexpected error occurred.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   // Email validation logic using regex
@@ -72,7 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: TextStyle(
                       fontSize: screenWidth * 0.08,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: brandOrange,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -83,7 +130,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     'Enter your email to reset your password',
                     style: TextStyle(
                       fontSize: screenWidth * 0.04,
-                      color: Colors.grey[600],
+                      color: brandTeal,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -95,13 +142,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: const TextStyle(color: Colors.black87),
                     decoration: InputDecoration(
                       labelText: 'Email address',
-                      labelStyle: TextStyle(color: Colors.grey[600]),
+                      labelStyle: const TextStyle(color: brandTeal),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                       errorText: _emailError,
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
+                        borderSide: const BorderSide(color: brandTeal),
                         borderRadius: BorderRadius.circular(screenWidth * 0.02),
                       ),
                     ),
@@ -112,7 +159,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ElevatedButton(
                     onPressed: _validateAndSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
+                      backgroundColor: brandOrange,
                       foregroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.2,
@@ -140,7 +187,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Text(
                       'Back to Log In',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: brandTeal,
                         fontSize: screenWidth * 0.035,
                       ),
                     ),

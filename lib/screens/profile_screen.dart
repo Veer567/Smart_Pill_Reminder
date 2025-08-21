@@ -1,173 +1,251 @@
+// lib/screens/profile_screen.dart
 import 'package:flutter/material.dart';
-import 'package:medicine/screens/welcome_screen.dart';
-import 'package:medicine/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:medicine/screens/welcome_screen.dart'; // Import the WelcomeScreen
 
-// Profile screen where users can view and edit personal information
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Controllers for form fields
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  // Controller to manage the text in the display name field.
+  final _nameController = TextEditingController();
+  // State variable to show a loading indicator during profile updates.
+  bool _loading = false;
+  // A global key to manage the form state, allowing for validation.
+  final _formKey = GlobalKey<FormState>();
 
-  // Toggle for showing/hiding password
-  bool _isPasswordVisible = false;
+  // State variable to manage the selected index of the BottomNavigationBar.
+  int _selectedIndex = 2; // 'Profile' is the third item (index 2)
 
-  // Dispose controllers when the screen is destroyed
+  // Define brand colors for consistency
+  static const Color brandOrange = Color(0xFFF28C38);
+  static const Color brandTeal = Color(0xFF2E7D7D);
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate the text field with the user's current display name.
+    final user = FirebaseAuth.instance.currentUser;
+    _nameController.text = user?.displayName ?? '';
+  }
+
   @override
   void dispose() {
-    emailController.dispose();
-    nameController.dispose();
-    phoneController.dispose();
-    passwordController.dispose();
+    // Clean up the controller when the widget is disposed to prevent memory leaks.
+    _nameController.dispose();
     super.dispose();
+  }
+
+  // Asynchronous function to handle the profile update logic.
+  Future<void> _updateProfile() async {
+    // Only proceed if the form is valid (e.g., the name field is not empty).
+    if (_formKey.currentState?.validate() ?? false) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() => _loading = true);
+        try {
+          // Update the user's display name on Firebase.
+          await user.updateDisplayName(_nameController.text.trim());
+          await user.reload(); // Reload user data to get the latest info.
+          // Show a success message to the user.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Profile updated successfully!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } catch (e) {
+          // Show an error message if the update fails.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to update profile: $e"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } finally {
+          // Hide the loading indicator.
+          setState(() => _loading = false);
+        }
+      }
+    }
+  }
+
+  // A helper function to get the first initial for the avatar.
+  String _getUserInitial(User? user) {
+    if (user?.displayName != null && user!.displayName!.isNotEmpty) {
+      return user.displayName![0].toUpperCase();
+    }
+    return user?.email != null && user!.email!.isNotEmpty
+        ? user.email![0].toUpperCase()
+        : '?';
+  }
+
+  // Method to handle navigation bar item taps.
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    // In a real app, you would navigate to different screens here.
+    // For now, we'll just print the selected index.
+    print("Tapped on index: $index");
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          children: [
-            // Top Bar with back button and settings icon
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  onPressed: () {
-                    // Navigate back to HomeScreen
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
-                    );
-                  },
-                ),
-                const Icon(Icons.settings),
-              ],
-            ),
+    final user = FirebaseAuth.instance.currentUser;
 
-            const SizedBox(height: 20),
-
-            const SizedBox(height: 30),
-
-            // Name input field
-            const Text("Your Name"),
-            const SizedBox(height: 8),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                hintText: "Enter your name",
-                prefixIcon: const Icon(Icons.person_outline),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Email input field
-            const Text("Your Email"),
-            const SizedBox(height: 8),
-            TextField(
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                hintText: "yourname@example.com",
-                prefixIcon: const Icon(Icons.email_outlined),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Phone number input field
-            const Text("Phone Number"),
-            const SizedBox(height: 8),
-            TextField(
-              controller: phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                hintText: "+91 1234567890",
-                prefixIcon: const Icon(Icons.phone_outlined),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Password input field with visibility toggle
-            const Text("Password"),
-            const SizedBox(height: 8),
-            TextField(
-              controller: passwordController,
-              obscureText: !_isPasswordVisible,
-              decoration: InputDecoration(
-                hintText: "••••••••",
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [brandTeal, brandOrange], // Updated gradient
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor:
+            Colors.transparent, // Set Scaffold background to transparent
+        body: SafeArea(
+          child: _loading
+              ? const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 40.0,
                   ),
-                  onPressed: () {
-                    // Toggle password visibility
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            // Logout button that navigates to WelcomeScreen
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.orange),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          "My Profile",
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 40),
+                        Center(
+                          child: CircleAvatar(
+                            radius: 60,
+                            backgroundColor: brandTeal.withOpacity(
+                              0.5,
+                            ), // Updated avatar color
+                            child: Text(
+                              _getUserInitial(user),
+                              style: const TextStyle(
+                                fontSize: 48,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: Text(
+                            user?.email ?? 'No email found',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        TextFormField(
+                          controller: _nameController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            labelText: 'Display Name',
+                            labelStyle: const TextStyle(color: Colors.white70),
+                            filled: true,
+                            fillColor: brandTeal.withOpacity(
+                              0.3,
+                            ), // Updated fill color
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: const BorderSide(
+                                color: Colors.white,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a name';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                        ElevatedButton(
+                          onPressed: _updateProfile,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                brandOrange, // Updated button color
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text(
+                            "Save Changes",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        OutlinedButton(
+                          onPressed: () async {
+                            await FirebaseAuth.instance.signOut();
+                            // Navigate to the Welcome Screen after logout
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const WelcomeScreen(),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(
+                              color: brandTeal, // Updated outline color
+                              width: 1.5,
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: const Text(
+                            "Logout",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: () {
-                  // Navigate to WelcomeScreen on logout
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                  );
-                },
-                child: const Text(
-                  "Logout",
-                  style: TextStyle(
-                    color: Colors.orange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

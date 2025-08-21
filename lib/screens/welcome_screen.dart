@@ -13,32 +13,32 @@ class WelcomeScreen extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     // Define common button size
-    final buttonWidth = screenWidth * 0.6; // Wider buttons as per design
-    final buttonHeight = screenHeight * 0.07; // Taller buttons
+    final buttonWidth = screenWidth * 0.6;
+    final buttonHeight = screenHeight * 0.07;
+
+    // Define colors from the logo
+    const Color brandOrange = Color(0xFFF28C38);
+    const Color brandTeal = Color(0xFF2E7D7D);
 
     return Scaffold(
-      backgroundColor: Colors.white, // White background
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
-          // Center widget to vertically and horizontally center the content
           child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: screenHeight, // Ensure it takes full height
-            ),
+            constraints: BoxConstraints(minHeight: screenHeight),
             child: IntrinsicHeight(
               child: Column(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Center vertically
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Logo/Image at the top
                   Image.asset(
-                    'assets/images/group.png', // Replace with your logo asset
+                    'assets/images/group.png',
                     height: screenHeight * 0.2,
                     width: screenWidth * 0.4,
                   ),
                   SizedBox(height: screenHeight * 0.03),
 
-                  // Dashed line separator
+                  // Dashed line separator (updated to solid for visibility)
                   Container(
                     height: 1,
                     width: screenWidth * 0.8,
@@ -46,7 +46,7 @@ class WelcomeScreen extends StatelessWidget {
                       border: Border(
                         bottom: BorderSide(
                           color: Colors.blue[200]!,
-                          style: BorderStyle.none,
+                          style: BorderStyle.solid, // Changed to solid line
                           width: 1.0,
                         ),
                       ),
@@ -60,7 +60,7 @@ class WelcomeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: screenWidth * 0.08,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFFF28C38), // Orange color from the image
+                      color: brandOrange, // Orange color from the logo
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -79,7 +79,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: screenHeight * 0.05),
 
-                  // Sign In button
+                  // Sign In button (updated to orange)
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -88,7 +88,7 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2E7D7D), // Teal color
+                      backgroundColor: brandOrange, // Use the new brand color
                       foregroundColor: Colors.white,
                       minimumSize: Size(buttonWidth, buttonHeight),
                       shape: RoundedRectangleBorder(
@@ -102,7 +102,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: screenHeight * 0.02),
 
-                  // Create Account button
+                  // Create Account button (updated to a teal outlined button)
                   OutlinedButton(
                     onPressed: () {
                       Navigator.push(
@@ -111,8 +111,10 @@ class WelcomeScreen extends StatelessWidget {
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      side: BorderSide(color: Colors.black), // Teal outline
+                      side: const BorderSide(
+                        color: brandTeal,
+                        width: 2,
+                      ), // Teal outline
                       minimumSize: Size(buttonWidth, buttonHeight),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -122,7 +124,7 @@ class WelcomeScreen extends StatelessWidget {
                       'Create account',
                       style: TextStyle(
                         fontSize: screenWidth * 0.045,
-                        color: Colors.white,
+                        color: brandTeal, // Teal text
                       ),
                     ),
                   ),
